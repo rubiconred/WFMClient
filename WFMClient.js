@@ -17,7 +17,7 @@ module.exports = function (host, apiKey, accountKey) {
 
     var options = {
       hostname: host,
-      path: path + '?apiKey='+apiKey+'&accountKey='+accountKey,
+      path: path + '?apiKey=' + apiKey + '&accountKey=' + accountKey,
       method: method
     };
 
@@ -49,6 +49,17 @@ module.exports = function (host, apiKey, accountKey) {
   }
 
   return {
+
+    /**
+     * Returns a timesheet  for particular id
+     * @param  {String}   id   Existing WFM Timesheet ID to get
+     * @param  {Function} done Callback that will be called with (err, responseData)
+     */
+    getTimesheet: function (id, done) {
+      makeApiRequest(undefined, '/time.api/get' + id, 'GET', done);
+    },
+
+
     /**
      * Posts a new Timesheet to Workflow Max
      * @param  {String}   jobId   WFM Job ID
@@ -59,14 +70,14 @@ module.exports = function (host, apiKey, accountKey) {
      * @param  {String}   note    Description / comment
      * @param  {Function} done    Callback that will be called with (err, responseData)
      */
-    createTimesheet: function (jobId, taskId, staffId, date, minutes, note, done) {
+    createTimesheet: function (obj, done) {
       var body = templates.timesheets.create({
-        jobId: jobId,
-        taskId: taskId,
-        staffId: staffId,
-        date: date,
-        minutes: minutes,
-        note: note
+        jobId: obj.jobId,
+        taskId: obj.taskId,
+        staffId: obj.staffId,
+        date: obj.date,
+        minutes: obj.minutes,
+        note: obj.note
       });
 
       makeApiRequest(body, '/time.api/add', 'POST', done);
@@ -83,15 +94,15 @@ module.exports = function (host, apiKey, accountKey) {
      * @param  {String}   note    Description / comment
      * @param  {Function} done    Callback that will be called with (err, responseData)
      */
-    updateTimesheet: function (id, jobId, taskId, staffId, date, minutes, note, done) {
+    updateTimesheet: function (obj, done) {
       var body = templates.timesheets.update({
-        id: id,
-        jobId: jobId,
-        taskId: taskId,
-        staffId: staffId,
-        date: date,
-        minutes: minutes,
-        note: note
+        id: obj.id,
+        jobId: obj.jobId,
+        taskId: obj.taskId,
+        staffId: obj.staffId,
+        date: obj.date,
+        minutes: obj.minutes,
+        note: obj.note
       });
 
       makeApiRequest(body, '/time.api/update', 'PUT', done);
@@ -137,7 +148,25 @@ module.exports = function (host, apiKey, accountKey) {
      * @param  {Function} done Callback that will be called with (err, responseData)
      */
     getCurrentJobs: function (done) {
-      makeApiRequest(undefined, '/job.api/current', 'GET', done);
+      makeApiRequest(undefined, '/job.api/tasks', 'GET', done);
+    },
+
+    /**
+     * Returns a list of tasks for particular job
+     * @param  {String}   id   Existing WFM Timesheet ID to delete
+     * @param  {Function} done Callback that will be called with (err, responseData)
+     */
+    getTask: function (id, done) {
+      makeApiRequest(undefined, '/task.api/get' + id, 'GET', done);
+    },
+
+    /**
+     * Returns a list of tasks for particular job
+     * @param  {String}   id   Existing WFM Timesheet ID to delete
+     * @param  {Function} done Callback that will be called with (err, responseData)
+     */
+    getStaffMember: function (id, done) {
+      makeApiRequest(undefined, '/staff.api/get' + id, 'GET', done);
     },
 
     /**
@@ -145,7 +174,7 @@ module.exports = function (host, apiKey, accountKey) {
      * * @param  {Function} done Callback that will be called with (err, responseData)
      */
     getStaff: function (done) {
-      makeApiRequest(undefined, '/staff.api/list', 'GET', done)
+      makeApiRequest(undefined, '/staff.api/list/', 'GET', done)
     }
   };
 };
